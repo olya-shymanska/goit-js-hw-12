@@ -26,9 +26,8 @@ const searchFormSubmit = async event => {
         event.preventDefault();
         gallery.innerHTML = '';
         loadMoreButton.style.display = 'none';
-
         searchedQuery = event.currentTarget.elements.query.value.trim();
-        currentPage = 1; // Reset page for a new search
+        currentPage = 1;
 
         if (searchedQuery === '') {
             iziToast.show({
@@ -53,17 +52,17 @@ const searchFormSubmit = async event => {
                 position: 'topRight',
                 message: 'Sorry, there are no images matching your search query. Please try again!'
             });
+            searchForm.reset();
             loading.style.display = 'none';
             return;
         }
 
         gallery.innerHTML = data.hits.map(el => cardTemplate(el)).join('');
-
         lightbox.refresh();
 
         loading.style.display = 'none';
 
-        if (data.total > perPage) {
+        if (data.totalHits > perPage) {
             loadMoreButton.style.display = 'block';
         }
 
@@ -76,10 +75,12 @@ const searchFormSubmit = async event => {
 };
 
 const loadMoreImages = async () => {
+    
     try {
         currentPage += 1;
-        loading.style.display = 'block';
 
+        loading.style.display = 'block'; 
+        
         const { data } = await fetchPhotos(searchedQuery, currentPage);
 
         if (data.hits.length === 0) {
@@ -91,8 +92,8 @@ const loadMoreImages = async () => {
         gallery.insertAdjacentHTML('beforeend', newGalleryHTML);
 
         lightbox.refresh();
-        loading.style.display = 'none';
-        
+         loading.style.display = 'none';
+
         const cardHeight = document.querySelector('.photo-card').getBoundingClientRect().height;
         window.scrollBy({
             top: cardHeight * 2,
@@ -115,6 +116,7 @@ const loadMoreImages = async () => {
         loading.style.display = 'none';
     }
 };
+
 
 
 
